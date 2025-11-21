@@ -95,7 +95,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
   onFileRename,
   onShare,
   activeFileProp,
-  showConsole = true,
+  showConsole = false, // Default to false to avoid double console
   onRunClick
 }) => {
   const { t } = useLanguage();
@@ -369,21 +369,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
                 <span>{activeFile || 'Empty'}</span>
             </div>
         </div>
-        <div className="flex items-center gap-2">
-            {onShare && (
-              <button onClick={onShare} className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-gray-300 bg-white/5 hover:bg-white/10 hover:text-white transition-colors rounded border border-white/10">
-                  <Share2 size={14} /> {t('editor.share')}
-              </button>
-            )}
-            <button 
-                onClick={() => onRunClick ? onRunClick() : handleRun()}
-                disabled={isRunning && !onRunClick}
-                className={`flex items-center gap-2 px-4 py-1.5 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-400 text-white text-xs font-bold uppercase tracking-wider rounded shadow-lg transition-all ${(isRunning && !onRunClick) ? 'opacity-70' : ''}`}
-            >
-                <Play size={12} fill="currentColor" />
-                {(isRunning && !onRunClick) ? t('editor.running') : t('editor.run')}
-            </button>
-        </div>
+        {/* Removed Duplicate Run Button and Share Button from here, now handled by Playground.tsx */}
       </div>
 
       <div className="flex flex-1 overflow-hidden">
@@ -451,7 +437,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
                 )}
             </div>
 
-            {/* Terminal / Console */}
+            {/* Terminal / Console - Render only if showConsole is true */}
             {showConsole && (
                 <div className="h-1/3 border-t border-origami-border bg-[#0A0A0C] flex flex-col">
                     <div className="px-4 py-2 border-b border-gray-800/50 flex items-center gap-2">

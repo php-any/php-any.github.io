@@ -4,6 +4,7 @@ export class OrigamiRuntime {
     private static instance: OrigamiRuntime;
     private wasmModule: WebAssembly.WebAssemblyInstantiatedSource | null = null;
     private go: any; // Go WASM runtime instance
+    private consoleOutput: string[] = [];
 
     private constructor() {
         // Initialize Go WASM runtime
@@ -26,14 +27,19 @@ export class OrigamiRuntime {
         try {
             const response = await fetch(wasmUrl);
             const buffer = await response.arrayBuffer();
+            
+            // Hook console.log to capture stdout from Go WASM
+            const originalLog = console.log;
+            console.log = (...args) => {
+                const line = args.join(" ");
+                this.consoleOutput.push(line);
+                originalLog(...args);
+            };
+
             const result = await WebAssembly.instantiate(buffer, this.go.importObject);
             this.wasmModule = result;
             
             // Run the WASM instance
-            // Note: In a real Go WASM app, 'go.run' might block until the program exits.
-            // For an interpreter, we usually expect it to register callbacks on 'window'
-            // and then stay alive, or run once. 
-            // Assuming Origami exposes a global function or waits for input.
             this.go.run(this.wasmModule.instance);
             
         } catch (e) {
@@ -43,20 +49,25 @@ export class OrigamiRuntime {
     }
 
     public async runCode(code: string): Promise<string> {
+        this.consoleOutput = []; // Clear previous logs
+
         // This assumes the WASM exposes a function `origamiRun(code)` on window
-        // after being initialized.
         if ((window as any).origamiRun) {
             try {
-                const output = await (window as any).origamiRun(code);
-                return output;
+                const result = await (window as any).origamiRun(code);
+                
+                // Combine stdout logs with the function return value
+                let finalOutput = this.consoleOutput.join("\n");
+                if (result) {
+                    finalOutput += (finalOutput ? "\n" : "") + result;
+                }
+                return finalOutput;
             } catch (e: any) {
                 return `Error: ${e.message}`;
             }
         }
         
-        // Fallback if WASM isn't fully integrated yet
         console.warn("WASM function 'origamiRun' not found. Is WASM loaded?");
         return "WASM runtime not ready.";
     }
 }
-
