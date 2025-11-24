@@ -7,64 +7,52 @@ export const HOME_FEATURES = {
       title: "Go-Powered Concurrency",
       description:
         "Spawn lightweight actors that communicate via message passing. Go's goroutines meet PHP's simple syntax.",
-      code: `use std/actor;
+      code: `// 并发示例
+echo "Main thread started\\n";
 
-actor Worker {
-    public function receive(string $msg) {
-        echo "Worker received: " . $msg;
-    }
+function worker($id: int) {
+  echo "Worker {$id} started\\n";
 }
 
-function main() {
-    // Spawns a goroutine under the hood
-    $w = spawn new Worker();
-    $w->send("Process data");
-    echo "Message sent non-blocking";
-}`,
+// 生成轻量级线程 (goroutine)
+spawn worker(1);
+spawn worker(2);
+
+echo "Main thread finished\\n";
+`,
     },
     {
       id: "types",
       title: "Refined Types",
       description:
         "Strong typing with runtime flexibility. Express complex constraints that are validated at compile time.",
-      code: `struct User {
-    public int $id;
-    public string $email; // | email_format
-    public int $age;      // | 0..120
+      code: `// 类型系统示例
+function add($a: int, $b: int): int {
+  return $a + $b;
 }
 
-function register(User $u) {
-    // No runtime validation needed
-    db::save($u);
-}
+$res = add(10, 20);
+echo "10 + 20 = {$res}\\n";
 
-function main() {
-    // Compiler error if format doesn't match
-    $u = new User(
-        id: 1, 
-        email: "invalid", // Error!
-        age: 200 // Error!
-    );
-}`,
+// 类型错误会在编译时捕获
+// $err = add("1", "2"); 
+`,
     },
     {
       id: "interop",
       title: "Seamless Go Interop",
       description:
         "Call Go functions and use Go structs directly. No FFI, no glue code, just seamless integration.",
-      code: `// Go standard library import
-use go/time;
-use go/fmt;
+      code: `// Go 互操作示例
+// 目前 WASM 环境支持部分内置函数
 
-function main() {
-    // Call Go function directly
-    $now = time::Now();
-    fmt::Println("Current time from Go:", $now);
-    
-    // Use Go struct methods
-    $duration = time::ParseDuration("1h30m");
-    echo "Duration seconds: " . $duration->Seconds();
-}`,
+$arr = [1, 2, 3];
+$sum = 0;
+foreach ($arr as $v) {
+  $sum += $v;
+}
+echo "Sum: {$sum}\\n";
+`,
     },
   ],
   zh: [
@@ -73,64 +61,52 @@ function main() {
       title: "Go 驱动的并发",
       description:
         "生成通过消息传递进行通信的轻量级 Actor。Go 的 Goroutine 遇上 PHP 的简洁语法。",
-      code: `use std/actor;
+      code: `// 并发示例
+echo "Main thread started\\n";
 
-actor Worker {
-    public function receive(string $msg) {
-        echo "Worker received: " . $msg;
-    }
+function worker($id: int) {
+  echo "Worker {$id} started\\n";
 }
 
-function main() {
-    // 底层生成一个 goroutine
-    $w = spawn new Worker();
-    $w->send("Process data");
-    echo "Message sent non-blocking";
-}`,
+// 生成轻量级线程 (goroutine)
+spawn worker(1);
+spawn worker(2);
+
+echo "Main thread finished\\n";
+`,
     },
     {
       id: "types",
       title: "精炼类型系统",
       description:
         "强类型与运行时灵活性的结合。直接在类型系统中表达复杂的约束，并在编译时进行验证。",
-      code: `struct User {
-    public int $id;
-    public string $email; // | email_format
-    public int $age;      // | 0..120
+      code: `// 类型系统示例
+function add($a: int, $b: int): int {
+  return $a + $b;
 }
 
-function register(User $u) {
-    // 无需运行时验证
-    db::save($u);
-}
+$res = add(10, 20);
+echo "10 + 20 = {$res}\\n";
 
-function main() {
-    // 如果格式不匹配则编译报错
-    $u = new User(
-        id: 1, 
-        email: "invalid", // Error!
-        age: 200 // Error!
-    );
-}`,
+// 类型错误会在编译时捕获
+// $err = add("1", "2"); 
+`,
     },
     {
       id: "interop",
       title: "无缝 Go 互操作",
       description:
         "直接调用 Go 函数和使用 Go 结构体。没有 FFI，没有胶水代码，只有无缝集成。",
-      code: `// 导入 Go 标准库
-use go/time;
-use go/fmt;
+      code: `// Go 互操作示例
+// 目前 WASM 环境支持部分内置函数
 
-function main() {
-    // 直接调用 Go 函数
-    $now = time::Now();
-    fmt::Println("Current time from Go:", $now);
-    
-    // 使用 Go 结构体方法
-    $duration = time::ParseDuration("1h30m");
-    echo "Duration seconds: " . $duration->Seconds();
-}`,
+$arr = [1, 2, 3];
+$sum = 0;
+foreach ($arr as $v) {
+  $sum += $v;
+}
+echo "Sum: {$sum}\\n";
+`,
     },
   ],
 };
@@ -342,146 +318,92 @@ export const SHOWCASE_PROJECTS = {
 export const CODE_EXAMPLES = {
   en: [
     {
-      category: "GUI Development",
-      title: "WebView Application",
-      description: "Create a desktop app with HTML UI and Go backend.",
-      code: `use std/webview;
+      category: "Basics",
+      title: "Hello World",
+      description: "Basic syntax and function definition.",
+      code: `// 基础语法示例
+echo "Hello Origami!\\n";
 
-function main() {
-    // Initialize WebView with debug enabled
-    $w = webview::create(true);
-    $w->setTitle("Origami App");
-    $w->setSize(800, 600);
+function greet($name: string) {
+    echo "Hello, {$name}\\n";
+}
 
-    // Bind PHP/Origami function to JS 'greet'
-    $w->bind("greet", function($name) {
-        return "Hello " . $name . " from Origami Core!";
-    });
-
-    $w->navigate("data:text/html,
-        <button onclick='callBackend()'>Click Me</button>
-        <script>
-            async function callBackend() {
-                const res = await window.greet('User');
-                alert(res);
-            }
-        </script>
-    ");
-    
-    $w->run();
-}`,
+greet("User");
+`,
     },
     {
-      category: "High Concurrency",
-      title: "IM WebSocket Server",
-      description: "Handle thousands of connections with goroutines.",
-      code: `use std/net/websocket;
+      category: "Data Structures",
+      title: "Array Processing",
+      description: "Using map and filter on arrays.",
+      code: `// 数组处理示例
+$nums = [1, 2, 3, 4, 5];
 
-function main() {
-    $server = websocket::listen(":8080");
-    
-    foreach ($server->accept() as $conn) {
-        // Spawn a goroutine for each connection
-        spawn function($c) {
-            defer $c->close();
-            
-            while ($msg = $c->read()) {
-                // Broadcast to all other users (pseudo-code)
-                // Channel operations are thread-safe by default
-                Hub::broadcast($msg);
-            }
-        }($conn);
-    }
-}`,
+// 使用 map 转换
+$doubled = $nums->map(($n) => $n * 2);
+echo "Doubled: " . $doubled->join(", ") . "\\n";
+
+// 使用 filter 过滤
+$evens = $nums->filter(($n) => $n % 2 == 0);
+echo "Evens: " . $evens->join(", ") . "\\n";
+`,
     },
     {
-      category: "System API",
-      title: "Performance Benchmark",
-      description: "Simple HTTP benchmark endpoint.",
-      code: `use std/http;
+      category: "Algorithms",
+      title: "Fibonacci",
+      description: "Recursive function call.",
+      code: `// 递归示例
+function fib($n: int): int {
+    if ($n <= 1) return $n;
+    return fib($n - 1) + fib($n - 2);
+}
 
-function main() {
-    http::handle("/bench", function($w, $r) {
-        // Zero-allocation response
-        $w->write("OK");
-    });
-    
-    // Utilizes all CPU cores automatically
-    echo "Bench server running on :3000";
-    http::listen(":3000");
-}`,
+echo "fib(10) = " . fib(10) . "\\n";
+`,
     },
   ],
   zh: [
     {
-      category: "GUI 开发",
-      title: "WebView 桌面应用",
-      description: "使用 HTML UI 和 Go 后端创建桌面应用。",
-      code: `use std/webview;
+      category: "基础",
+      title: "Hello World",
+      description: "基本语法和函数定义。",
+      code: `// 基础语法示例
+echo "Hello Origami!\\n";
 
-function main() {
-    // 初始化 WebView，启用调试
-    $w = webview::create(true);
-    $w->setTitle("Origami App");
-    $w->setSize(800, 600);
+function greet($name: string) {
+    echo "Hello, {$name}\\n";
+}
 
-    // 将 PHP/Origami 函数绑定到 JS 的 'greet'
-    $w->bind("greet", function($name) {
-        return "Hello " . $name . " from Origami Core!";
-    });
-
-    $w->navigate("data:text/html,
-        <button onclick='callBackend()'>Click Me</button>
-        <script>
-            async function callBackend() {
-                const res = await window.greet('User');
-                alert(res);
-            }
-        </script>
-    ");
-    
-    $w->run();
-}`,
+greet("User");
+`,
     },
     {
-      category: "高并发",
-      title: "IM WebSocket 服务器",
-      description: "使用 Goroutine 处理数千个连接。",
-      code: `use std/net/websocket;
+      category: "数据结构",
+      title: "数组处理",
+      description: "在数组上使用 map 和 filter。",
+      code: `// 数组处理示例
+$nums = [1, 2, 3, 4, 5];
 
-function main() {
-    $server = websocket::listen(":8080");
-    
-    foreach ($server->accept() as $conn) {
-        // 为每个连接生成一个 Goroutine
-        spawn function($c) {
-            defer $c->close();
-            
-            while ($msg = $c->read()) {
-                // 广播给所有其他用户 (伪代码)
-                // Channel 操作默认是线程安全的
-                Hub::broadcast($msg);
-            }
-        }($conn);
-    }
-}`,
+// 使用 map 转换
+$doubled = $nums->map(($n) => $n * 2);
+echo "Doubled: " . $doubled->join(", ") . "\\n";
+
+// 使用 filter 过滤
+$evens = $nums->filter(($n) => $n % 2 == 0);
+echo "Evens: " . $evens->join(", ") . "\\n";
+`,
     },
     {
-      category: "系统 API",
-      title: "性能基准测试",
-      description: "简单的 HTTP 基准测试端点。",
-      code: `use std/http;
+      category: "算法",
+      title: "斐波那契数列",
+      description: "递归函数调用。",
+      code: `// 递归示例
+function fib($n: int): int {
+    if ($n <= 1) return $n;
+    return fib($n - 1) + fib($n - 2);
+}
 
-function main() {
-    http::handle("/bench", function($w, $r) {
-        // 零内存分配响应
-        $w->write("OK");
-    });
-    
-    // 自动利用所有 CPU 核心
-    echo "Bench server running on :3000";
-    http::listen(":3000");
-}`,
+echo "fib(10) = " . fib(10) . "\\n";
+`,
     },
   ],
 };
